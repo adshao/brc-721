@@ -102,6 +102,29 @@ Transfer multiple tokens:
 
 > This operation should be only allowed for the deployer.
 
+## FAQ
+
+### What is the difference between brc-721 and ordinals inscription?
+
+Similar to brc-20, brc-721 is built upon the ordinals protocol. Although ordinals inscription can store images by itself, there are significant functional differences between brc-721 and ordinals:
+
+* Data storage
+
+    * ordinals stores image data in the witness field, which has the advantage of storing data on-chain without relying on third parties. This is useful for applications that prioritize asset security. However, it also introduces some issues, such as high minting costs and occupying a large amount of Bitcoin network space.
+    * Brc-721 saves images and other data in external services, greatly reducing the space occupied on the Bitcoin network.
+
+* Compatibility with brc protocol
+
+    * brc-721 adopts a similar protocol format to brc-20, using JSON to define different functions, which greatly enhances the flexibility of NFTs. For example, it supports the reveal operation by updating the base URI; the tick field enables efficient indexing of NFTs in a collection.
+
+* Compatibility with the NFT ecosystem
+
+    * The erc-721 standard NFT is more popular in the current market. Brc-721's token URI and metadata specifications are consistent with erc-721, allowing for quick adaptation to the existing NFT ecosystem. In addition, while ordinals does not support fields such as traits, brc-721 supports defining NFT attributes and rarity information.
+
+### What is the difference between brc-721 and brc721.com?
+
+brc721.com also proposes a non-fungible token (NFT) solution based on the ordinals protocol, but its protocol is more complex and not compatible with brc-20. In contrast, brc-721 aims to maintain consistency with the brc-20 standard.
+
 ## Contribution
 
 BRC-721 is an experimental standard that brings non-fungible tokens (NFTs) to the Bitcoin network. With this standard, users can create, mint, transfer, and update unique digital assets, enabling a wide range of use cases, such as digital art, collectibles, virtual goods, and more.  
