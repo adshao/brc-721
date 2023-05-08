@@ -13,7 +13,7 @@ BRC-721 is designed for non-fungible tokens (NFTs) on the Bitcoin network. It al
     "p": "brc-721",
     "op": "deploy",
     "tick": "ordinals",
-    "base_uri": "https://ipfs.io/",
+    "buri": "https://ipfs.io/",
     "max": "10000",
     "lim": "1"
 }
@@ -24,11 +24,11 @@ BRC-721 is designed for non-fungible tokens (NFTs) on the Bitcoin network. It al
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
 | op | Yes | Operation: Type of event (deploy, mint, transfer, update) |
 | tick | Yes | Ticker: identifier of the brc-721, no more than 16 letters |
-| base_uri | Yes | BaseURI URI for the brc-721, access `{base_uri}{token_id}` for the token information |
+| buri | Yes | BaseURI URI for the brc-721, access `{buri}{token_id}` for the token information |
 | max | Yes | Max supply: set max supply of the brc-721 |
 | lim | No | Mint limit: if letting users mint to themselves, limit per ordinal |
 
-Please find more information at [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards).
+For more information about tokenURI and metadata, please refer to [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards).
 
 ### Mint brc-721
 
@@ -89,7 +89,7 @@ Transfer multiple tokens:
     "p": "brc-721",
     "op": "update",
     "tick": "ordinals",
-    "base_uri": "https://ipfs.io/"
+    "buri": "https://ipfs.io/"
 }
 ```
 
@@ -98,7 +98,7 @@ Transfer multiple tokens:
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
 | op | Yes | Operation: Type of event (deploy, mint, transfer, update) |
 | tick | Yes | Ticker: identifier of the brc-721, no more than 16 letters |
-| base_uri | Yes | BaseURI URI for the brc-721, access {base_uri}{token_id} for the token information |
+| buri | Yes | BaseURI URI for the brc-721, access {buri}{token_id} for the token information |
 
 > This operation should be only allowed for the deployer.
 
