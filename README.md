@@ -117,6 +117,30 @@ It's simple to transfer an brc-721 token, just send the inscription minted above
 
 * This operation should be only allowed for the deployer who hold the deploy inscription
 
+## State Changes
+
+* NFT Deployer
+
+  * The address holding the deploy inscription is the deployer
+  * The receiving address of the first deploy inscription minting becomes the deployer
+  * If the deploy inscription is transferred to a new address, the new address becomes the deployer
+  * The deployer can modify the `buri`
+
+* Token ID
+
+  * Similar to ERC721, each token in a BRC-721 collection has a unique ID
+  * Each `mint` operation's inscription generates a token with a token ID ranging from 1 to `max` (the total supply defined in the deploy inscription) in the order of inscription ID
+  * Minting inscriptions beyond the total supply are invalid
+
+* Token Owner
+
+  * The address holding the mint inscription is the owner of the token
+  * When the mint inscription is transferred to a new address, the owner changes to the new address
+
+* Transfer
+
+  * Transfer the NFT token using `ord wallet send <ADDRESS> <INSCRIPTION ID>`
+
 ## FAQ
 
 ### What are the differences between brc-721 and native ordinals NFT?

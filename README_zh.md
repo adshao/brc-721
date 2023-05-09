@@ -115,6 +115,30 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 
 * 此操作仅允许拥有部署铭文的部署者执行
 
+## 状态变更
+
+* NFT Deployer
+
+  * 持有deploy inscription的地址即为deployer
+  * 首次铸造deploy inscription的接收地址即为deployer
+  * 如果deploy inscription转移到新的地址，则新地址为deployer
+  * deployer可以修改`buri`
+
+* Token ID
+
+  * 与ERC721类似，BRC-721每个collection的token都具有唯一ID
+  * 每个`mint`操作的inscription，将产生一个token，按照inscription ID的顺序，token ID从1到`max`（deploy inscription中定义的总量）
+  * 超过总量后mint inscription无效
+
+* Token Owner
+
+  * 持有mint inscription的地址即为该token的owner
+  * mint inscription转移给新的地址后，owner变更为新地址
+
+* Transfer 转账
+
+  * 通过`ord wallet send <ADDRESS> <INSCRIPTION ID>`转移该NFT token
+
 ## 常见问题解答
 
 ### brc-721与原生ordinals NFT有何不同？
