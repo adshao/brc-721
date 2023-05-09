@@ -1,6 +1,12 @@
+[English](./README.md) | [中文版本](./README_zh.md)
+
+---
+
 # BRC-721: Non-Fungible Tokens on the Bitcoin Network
 
-BRC-721 is inspired by the BRC-20, an experimental standard for creating fungible tokens on the Bitcoin network. BRC-20, which can be found at [brc-20-experiment](https://domo-2.gitbook.io/brc-20-experiment), aims to bring the functionality of Ethereum's ERC-20 tokens to the Bitcoin ecosystem. By building upon the ideas and principles of BRC-20, BRC-721 extends the capabilities of tokenization on the Bitcoin network to include non-fungible tokens, thus enabling a broader range of digital asset management and value representation.
+BRC-721 is inspired by the BRC-20, an experimental standard for creating fungible tokens on the Bitcoin network. BRC-20, which can be found at [brc-20-experiment](https://domo-2.gitbook.io/brc-20-experiment), aims to bring the functionality of issuing tokens to the Bitcoin ecosystem.
+
+By building upon the ideas and principles of BRC-20, BRC-721 extends the capabilities of tokenization on the Bitcoin network to include non-fungible tokens, thus enabling a broader range of digital asset management and value representation.
 
 BRC-721 is designed for non-fungible tokens (NFTs) on the Bitcoin network. It allows for the creation, ownership, and transfer of unique digital assets on the Bitcoin blockchain. Each token created under BRC-721 has a unique identifier, making them distinct and non-interchangeable.  
 
@@ -8,27 +14,54 @@ BRC-721 is designed for non-fungible tokens (NFTs) on the Bitcoin network. It al
 
 ### Deploy brc-721
 
+Deploy NFT with an external base URI to provide metadata for each token:
+
 ``` json
 {
     "p": "brc-721",
     "op": "deploy",
     "tick": "ordinals",
-    "buri": "https://ipfs.io/",
     "max": "10000",
-    "lim": "1"
+    "buri": "https://ipfs.io/abc/"
 }
 ```
+
+* For token ID 1, the metadata is located at `https://ipfs.io/abc/1`
+
+Deploy NFT with onchain metadata:
+
+``` json
+{
+    "p": "brc-721",
+    "op": "deploy",
+    "tick": "ordinals",
+    "max": "10000",
+    "meta": {
+        "name": "Ordinals",
+        "description": "Bring NFT to Bitcoin", 
+        "image": "https://storage.googleapis.com/opensea-prod.appspot.com/puffs/3.png",
+        "attributes": [
+            {
+                "trait_type": "trait1", 
+                "value": "value1"
+            }, ... ]
+    }
+}
+```
+
+* All tokens of the collections will share the same metadata.
 
 | Key | Required? | Description |
 |---|---|---|
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
-| op | Yes | Operation: Type of event (deploy, mint, transfer, update) |
-| tick | Yes | Ticker: identifier of the brc-721, no more than 16 letters |
-| buri | Yes | BaseURI URI for the brc-721, access `{buri}{token_id}` for the token information |
+| op | Yes | Operation: Type of event (deploy, mint, update) |
+| tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
+| buri | No | BaseURI URI for the brc-721, access `{buri}{token_id}` for the metadata of a token |
+| meta | No | The metadata of the collection |
 | max | Yes | Max supply: set max supply of the brc-721 |
-| lim | No | Mint limit: if letting users mint to themselves, limit per ordinal |
 
-For more information about tokenURI and metadata, please refer to [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards).
+* either `buri` or `meta` should be stated, `meta` take precedence
+* For more information about token URI and metadata, please refer to [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards)
 
 ### Mint brc-721
 
@@ -36,51 +69,21 @@ For more information about tokenURI and metadata, please refer to [EIP-721](http
 {
     "p": "brc-721",
     "op": "mint",
-    "tick": "ordinals",
-    "amt": "1"
+    "tick": "ordinals"
 }
 ```
 
 | Key | Required? | Description |
 |---|---|---|
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
-| op | Yes | Operation: Type of event (deploy, mint, transfer, update) |
-| tick | Yes | Ticker: identifier of the brc-721, no more than 16 letters |
-| amt | No | Amount to mint: States the amount of the brc-721 to mint. Has to be less than "lim" above if stated, default amt is 1 |
+| op | Yes | Operation: Type of event (deploy, mint, update) |
+| tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
 
-> token id is generated from 1 to "max" according to the inscription id  
+* token ID is generated from 1 to `max` according to the order of inscription IDs.
 
 ### Transfer brc-721
 
-Transfer one token:  
-
-``` json
-{
-    "p": "brc-721",
-    "op": "transfer",
-    "tick": "ordinals",
-    "id": "1"
-}
-```
-
-Transfer multiple tokens:
-
-``` json
-{
-    "p": "brc-721",
-    "op": "transfer",
-    "tick": "ordinals",
-    "ids": ["1", "2"]
-}
-```
-
-| Key | Required? | Description |
-|---|---|---|
-| p | Yes | Protocol: Helps other systems identify and process brc-721 events |
-| op | Yes | Operation: Type of event (deploy, mint, transfer, update) |
-| tick | Yes | Ticker: identifier of the brc-721, no more than 16 letters |
-| id | No | Token id to transfer, either "id" or "ids" should be stated |
-| ids | No | Multiple token ids to transfer, either "id" or "ids" should be stated |
+It's simple to transfer an brc-721 token, just send the inscription minted above to the receiver. There is no need to mint a transfer inscription before sending like brc-20.
 
 ### Update Metadata
 
@@ -89,41 +92,52 @@ Transfer multiple tokens:
     "p": "brc-721",
     "op": "update",
     "tick": "ordinals",
-    "buri": "https://ipfs.io/"
+    "buri": "https://ipfs.io/abc"
 }
 ```
 
 | Key | Required? | Description |
 |---|---|---|
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
-| op | Yes | Operation: Type of event (deploy, mint, transfer, update) |
-| tick | Yes | Ticker: identifier of the brc-721, no more than 16 letters |
-| buri | Yes | BaseURI URI for the brc-721, access {buri}{token_id} for the token information |
+| op | Yes | Operation: Type of event (deploy, mint, update) |
+| tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
+| buri | No | BaseURI URI for the brc-721, access `{buri}{token_id}` for the metadata of a token |
 
-> This operation should be only allowed for the deployer.
+* This operation should be only allowed for the deployer who hold the deploy inscription.
 
 ## FAQ
 
-### What is the difference between brc-721 and ordinals inscription?
+### What are the differences between brc-721 and native ordinals NFT?
 
-Similar to brc-20, brc-721 is built upon the ordinals protocol. Although ordinals inscription can store images by itself, there are significant functional differences between brc-721 and ordinals:
+BRC-721 is built upon the ordinals protocol. Although native ordinals NFT itself can store images, there are significant functional differences between brc-721 and native ordinals NFT:
 
 * Data storage
 
-    * ordinals stores image data in the witness field, which has the advantage of storing data on-chain without relying on third parties. This is useful for applications that prioritize asset security. However, it also introduces some issues, such as high minting costs and occupying a large amount of Bitcoin network space.
-    * Brc-721 saves images and other data in external services, greatly reducing the space occupied on the Bitcoin network.
+  * Native ordinals NFT stores images for each token, which can lead to high minting fees and occupy a large amount of Bitcoin network space.
 
-* Compatibility with brc protocol
+  * BRC-721 only needs to save the image once during deployment, and the mint operation does not require saving the image, which can significantly save minting fees and Bitcoin network space. Additionally, brc-721 supports storing images in off-chain services like IPFS, saving Bitcoin space and providing flexible attribute information for each token.
 
-    * brc-721 adopts a similar protocol format to brc-20, using JSON to define different functions, which greatly enhances the flexibility of NFTs. For example, it supports the reveal operation by updating the base URI; the tick field enables efficient indexing of NFTs in a collection.
+  * Native ordinals NFT cannot effectively index a Collection, while brc-721 provides a JSON specification similar to brc-20, enabling effective indexing and searching of NFTs within a Collection.
 
-* Compatibility with the NFT ecosystem
+* BRC protocol compatibility
 
-    * The erc-721 standard NFT is more popular in the current market. Brc-721's token URI and metadata specifications are consistent with erc-721, allowing for quick adaptation to the existing NFT ecosystem. In addition, while ordinals does not support fields such as traits, brc-721 supports defining NFT attributes and rarity information.
+  * BRC-721 adopts a protocol format similar to brc-20, defining different functions through JSON content, greatly improving the flexibility of NFTs. For example, the reveal function can be implemented through the update operation; the tick field enables effective indexing of NFTs within a Collection.
 
-### What is the difference between brc-721 and brc721.com?
+* NFT ecosystem compatibility
 
-brc721.com also proposes a non-fungible token (NFT) solution based on the ordinals protocol, but its protocol is more complex and not compatible with brc-20. In contrast, brc-721 aims to maintain consistency with the brc-20 standard.
+  * ERC-721 standard NFTs are more popular in the current market. BRC-721 adopts token URI and metadata specifications consistent with ERC-721, enabling quick adaptation to the existing NFT ecosystem. Meanwhile, native ordinals do not support traits and other fields, while brc-721 supports defining NFT attributes and rarity information.
+
+### What are the differences between brc-721 and brc-20?
+
+* BRC-721 is used for Non-Fungible Tokens (NFT), while brc-20 is used for Fungible Tokens
+
+* BRC-721 follows the brc-20 specifications, using JSON to define tokens and functions
+
+* BRC-20 requires minting an inscription before transferring, which is necessary for fungible tokens, but it leads to high transfer costs and increases invalid information on the Bitcoin network. BRC-721 takes advantage of the ordinals inscription feature and can complete the transfer directly by sending, significantly reducing costs and decreasing invalid information on the network.
+
+### What are the differences between brc-721 and brc721.com?
+
+[brc721.com](https://www.brc721.com/) also proposes a Non-Fungible Token (NFT) solution based on the ordinals protocol, but its protocol is more complex and is not compatible with brc-20. BRC-721, on the other hand, is consistent with the brc-20 standard.
 
 ## Contribution
 
