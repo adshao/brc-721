@@ -1,4 +1,4 @@
-[English](./README.md) | [中文版本](./README_zh.md)
+[English](./README.md) | [中文](./README_zh.md)
 
 ---
 
@@ -10,7 +10,7 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 
 ## 操作
 
-### 部署 brc-721 NFT
+### 部署 brc-721
 
 部署一个brc-721 NFT，并使用外部链接为每个token提供图片和属性等信息：
 
@@ -59,9 +59,19 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 | max | 是 | 最大供应量：设置brc-721的最大供应量 |
 
 * `buri`或`meta`应至少填写一个，`meta`优先
+
+#### Metadata
+
+| Key | 必填? | 描述 |
+|---|---|---|
+| name | 是 | token名称 |
+| description | 是 | token描述 |
+| image | 是 | token图片链接，或者自描述的展示数据，比如：`data:image/svg+xml;base64,<base64_encoded_image_bytes>` |
+| attributes | 否 | token属性 |
+
 * 关于代币URI和元数据的更多信息，请参考[EIP-721](https://eips.ethereum.org/EIPS/eip-721)和[元数据标准](https://docs.opensea.io/docs/metadata-standards)
 
-### 铸造 brc-721 代币
+### 铸造 brc-721
 
 ``` json
 {
@@ -83,7 +93,7 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 
 转移brc-721代币非常简单，只需将上面铸造的铭文发送给接收者。无需像brc-20那样在发送前铸造一个转移铭文。
 
-### 修改 brc-721 元数据
+### 修改 brc-721
 
 ``` json
 {
@@ -101,7 +111,9 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 | tick | 是 | Ticker：brc-721的标识符，4到8个字母，不区分大小写 |
 | buri | 否 | BaseURI：brc-721的基本URI，访问`{buri}{token_id}`获取某个代币的元数据 |
 
-* 此操作仅允许拥有部署铭文的部署者执行。
+* 目前仅支持修改`buri`
+
+* 此操作仅允许拥有部署铭文的部署者执行
 
 ## 常见问题解答
 

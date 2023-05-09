@@ -1,4 +1,4 @@
-[English](./README.md) | [中文版本](./README_zh.md)
+[English](./README.md) | [中文](./README_zh.md)
 
 ---
 
@@ -61,6 +61,16 @@ Deploy NFT with onchain metadata:
 | max | Yes | Max supply: set max supply of the brc-721 |
 
 * either `buri` or `meta` should be stated, `meta` take precedence
+
+#### Metadata
+
+| Key | Required? | Description |
+|---|---|---|
+| name | Yes | Identifies the asset to which this NFT represents |
+| description | Yes | Describes the asset to which this NFT represents |
+| image | Yes | A URI pointing to a resource with mime type image, or self-decribed mime data, for example: `data:image/svg+xml;base64,<base64_encoded_image_bytes>` |
+| attributes | No | Token attributes |
+
 * For more information about token URI and metadata, please refer to [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards)
 
 ### Mint brc-721
@@ -85,7 +95,7 @@ Deploy NFT with onchain metadata:
 
 It's simple to transfer an brc-721 token, just send the inscription minted above to the receiver. There is no need to mint a transfer inscription before sending like brc-20.
 
-### Update Metadata
+### Update brc-721
 
 ``` json
 {
@@ -103,7 +113,9 @@ It's simple to transfer an brc-721 token, just send the inscription minted above
 | tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
 | buri | No | BaseURI URI for the brc-721, access `{buri}{token_id}` for the metadata of a token |
 
-* This operation should be only allowed for the deployer who hold the deploy inscription.
+* Currently, only allowed to update `buri`
+
+* This operation should be only allowed for the deployer who hold the deploy inscription
 
 ## FAQ
 
