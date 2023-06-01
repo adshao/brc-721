@@ -26,7 +26,7 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 
 * 对于token ID为1的代币，其元数据位于`https://ipfs.io/abc/1`
 
-部署一个brc-721 NFT，并将NFT元数据保存在链上：
+部署一个brc-721 NFT，将NFT元数据保存在链上，并设置为不可修改：
 
 ``` json
 {
@@ -43,7 +43,8 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
                 "trait_type": "trait1", 
                 "value": "value1"
             }, ... ]
-    }
+    },
+    "upd": false
 }
 ```
 
@@ -53,12 +54,14 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 |---|---|---|
 | p | 是 | 协议：帮助其他系统识别和处理brc-721事件 |
 | op | 是 | 操作：事件类型（部署，铸造，更新）|
-| tick | 是 | 标识符：brc-721的标识符，4到8个字母，不区分大小写 |
+| tick | 是 | 标识符：brc-721的标识符，不少于4个字母，不区分大小写 |
+| max | 是 | 最大供应量：设置brc-721的最大供应量 |
+| upd | 否 | 是否允许修改元数据，默认值 `true` |
 | buri | 否 | 基础URI：brc-721的基础URI，通过访问`{buri}{token_id}`获取代币的元数据 |
 | meta | 否 | 集合的元数据 |
-| max | 是 | 最大供应量：设置brc-721的最大供应量 |
 
-* `buri`或`meta`应至少填写一个，`meta`优先
+
+* 当且仅当 `upd` 为 `true`时，部署者才能通过发送 `update` 铭文来更新集合的元数据；否则，元数据是不可变的，后续任何 `update` 操作都将无效。
 
 #### Metadata
 
@@ -66,7 +69,7 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 |---|---|---|
 | name | 是 | token名称 |
 | description | 是 | token描述 |
-| image | 是 | token图片链接，或者自描述的展示数据，比如：`data:image/svg+xml;base64,<base64_encoded_image_bytes>` |
+| image | 否 | token图片链接，或 [Data URL Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme) 格式，如：`data:image/svg+xml;base64,<base64_encoded_image_bytes>` |
 | attributes | 否 | token属性 |
 
 * 关于代币URI和元数据的更多信息，请参考[EIP-721](https://eips.ethereum.org/EIPS/eip-721)和[元数据标准](https://docs.opensea.io/docs/metadata-standards)
@@ -100,7 +103,9 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
     "p": "brc-721",
     "op": "update",
     "tick": "ordinals",
-    "buri": "https://ipfs.io/abc"
+    "upd": false,
+    "buri": "https://ipfs.io/abc/",
+    "meta": { ... }
 }
 ```
 
@@ -109,11 +114,13 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 | p | 是 | 协议：帮助其他系统识别和处理brc-721事件 |
 | op | 是 | 操作：事件类型（部署，铸造，更新） |
 | tick | 是 | Ticker：brc-721的标识符，4到8个字母，不区分大小写 |
+| upd | 否 | 是否允许修改元数据，默认值 `true` |
 | buri | 否 | BaseURI：brc-721的基本URI，访问`{buri}{token_id}`获取某个代币的元数据 |
-
-* 目前仅支持修改`buri`
+| meta | 否 | 集合的元数据 |
 
 * 此操作仅允许拥有部署铭文的部署者执行
+* 仅 `upd`、`buri` 和 `meta` 字段允许被修改
+* 如果 `upd` 为 `true`，铭文部署者可以通过发送 `update` 铭文来更新集合的元数据；否则，元数据是不可变的，在 `upd` 设置为 `false` 的铭文后的任何 `update` 操作都将无效。
 
 ## 状态变更
 

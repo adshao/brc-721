@@ -28,7 +28,7 @@ Deploy NFT with an external base URI to provide metadata for each token:
 
 * For token ID 1, the metadata is located at `https://ipfs.io/abc/1`
 
-Deploy NFT with onchain metadata:
+Deploy NFT with onchain metadata and make the collection immutable:
 
 ``` json
 {
@@ -45,7 +45,8 @@ Deploy NFT with onchain metadata:
                 "trait_type": "trait1", 
                 "value": "value1"
             }, ... ]
-    }
+    },
+    "upd": false
 }
 ```
 
@@ -55,12 +56,13 @@ Deploy NFT with onchain metadata:
 |---|---|---|
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
 | op | Yes | Operation: Type of event (deploy, mint, update) |
-| tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
+| tick | Yes | Ticker: identifier of the brc-721, more than 4 letters, case insensive |
+| max | Yes | Max supply: set max supply of the brc-721 |
+| upd | No | Whether the metadata is updatable, default is `true` |
 | buri | No | BaseURI URI for the brc-721, access `{buri}{token_id}` for the metadata of a token |
 | meta | No | The metadata of the collection |
-| max | Yes | Max supply: set max supply of the brc-721 |
 
-* either `buri` or `meta` should be stated, `meta` take precedence
+* if `upd` is `true`, the deployer can update the metadata of the collection by sending an `update` inscription; otherwise, the metadata is immutable, any `update` op will be invalid.
 
 #### Metadata
 
@@ -68,7 +70,7 @@ Deploy NFT with onchain metadata:
 |---|---|---|
 | name | Yes | Identifies the asset to which this NFT represents |
 | description | Yes | Describes the asset to which this NFT represents |
-| image | Yes | A URI pointing to a resource with mime type image, or self-decribed mime data, for example: `data:image/svg+xml;base64,<base64_encoded_image_bytes>` |
+| image | No | A URI pointing to a resource with mime type image, or [Data URL Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme), for example: `data:image/svg+xml;base64,<base64_encoded_image_bytes>` |
 | attributes | No | Token attributes |
 
 * For more information about token URI and metadata, please refer to [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards)
@@ -102,7 +104,9 @@ It's simple to transfer an brc-721 token, just send the inscription minted above
     "p": "brc-721",
     "op": "update",
     "tick": "ordinals",
-    "buri": "https://ipfs.io/abc"
+    "upd": false,
+    "buri": "https://ipfs.io/abc/",
+    "meta": { ... }
 }
 ```
 
@@ -111,11 +115,13 @@ It's simple to transfer an brc-721 token, just send the inscription minted above
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
 | op | Yes | Operation: Type of event (deploy, mint, update) |
 | tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
+| upd | No | Whether the metadata is updatable, default is `true` |
 | buri | No | BaseURI URI for the brc-721, access `{buri}{token_id}` for the metadata of a token |
+| meta | No | The metadata of the collection |
 
-* Currently, only allowed to update `buri`
-
-* This operation should be only allowed for the deployer who hold the deploy inscription
+* This operation should be only allowed for the owner of the deploy inscription.
+* Only `upd`, `buri` and `meta` can be updated.
+* if `upd` is `true`, the deployer can update the metadata of the collection by sending an update inscription; otherwise, the metadata is immutable, any `update` op will be invalid after the inscription setting `upd` to `false`.
 
 ## State Changes
 
