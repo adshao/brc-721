@@ -118,7 +118,8 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
 | buri | 否 | BaseURI：brc-721的基本URI，访问`{buri}{token_id}`获取某个代币的元数据 |
 | meta | 否 | 集合的元数据 |
 
-* 此操作仅允许拥有部署铭文的部署者执行
+* 此操作仅允许拥有 `deploy` 铭文的地址执行
+* `update` 铭文必须由 `deploy` 铭文地址铸造，并发送自己
 * 仅 `upd`、`buri` 和 `meta` 字段允许被修改
 * 如果 `upd` 为 `true`，铭文部署者可以通过发送 `update` 铭文来更新集合的元数据；否则，元数据是不可变的，在 `upd` 设置为 `false` 的铭文后的任何 `update` 操作都将无效。
 
@@ -129,22 +130,31 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
   * 持有deploy inscription的地址即为deployer
   * 首次铸造deploy inscription的接收地址即为deployer
   * 如果deploy inscription转移到新的地址，则新地址为deployer
-  * deployer可以修改`buri`
 
 * Token ID
 
   * 与ERC721类似，BRC-721每个collection的token都具有唯一ID
   * 每个`mint`操作的inscription，将产生一个token，按照inscription ID的顺序，token ID从1到`max`（deploy inscription中定义的总量）
   * 超过总量后mint inscription无效
+  * `mint` 铭文ID必须大于 `deploy` 铭文ID
 
 * Token Owner
 
-  * 持有mint inscription的地址即为该token的owner
+  * 持有`mint` inscription的地址即为该token的owner
   * mint inscription转移给新的地址后，owner变更为新地址
 
 * Transfer 转账
 
   * 通过`ord wallet send <ADDRESS> <INSCRIPTION ID>`转移该NFT token
+
+* 元数据
+
+  * 当 `upd` 为 `false` 时，元数据是不可变的，之后的任何 `update` 铭文都将无效
+  * 当 `upd` 为 `true` 时，元数据允许被修改
+  * 铭文的元数据最初由 `deploy` 铭文设定
+  * 通过 `update` 铭文可以修改元数据
+  * `update` 铭文必须由 `deploy` 铭文地址铸造，并发送给自己
+  * `update` 铭文ID必须大于 `deploy` 铭文ID
 
 ## 常见问题解答
 
