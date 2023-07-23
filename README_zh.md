@@ -36,7 +36,7 @@ BRC-721专为比特币网络上的非同质化代币（NFT）设计。它允许�
     "max": "10000",
     "sig": {
       "pk": "04E32DF42865E97135ACFB65F3BAE71BDC86F4D49150AD6A440B6F15878109880A0A2B2667F7E725CEEA70C673093BF67663E0312623C8E091B13CF2C0F11EF652",
-      "fields": ["rec", "uid", "exp"]
+      "fields": ["rec", "uid", "exph"]
     },
     "buri": "https://ipfs.io/abc/"
 }
