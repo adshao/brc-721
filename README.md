@@ -14,7 +14,7 @@ BRC-721 is designed for non-fungible tokens (NFTs) on the Bitcoin network. It al
 
 ### Deploy brc-721
 
-Deploy NFT with an external base URI to provide metadata for each token:
+Example 1, deploy NFT with an external base URI to provide metadata for each token:
 
 ``` json
 {
@@ -28,7 +28,25 @@ Deploy NFT with an external base URI to provide metadata for each token:
 
 * For token ID 1, the metadata is located at `https://ipfs.io/abc/1`
 
-Deploy NFT with onchain metadata and make the collection immutable:
+Example 2, deploy a brc-721 NFT and set a public key to verify the signature of the minted inscriptions:
+
+``` json
+{
+    "p": "brc-721",
+    "op": "deploy",
+    "tick": "ordinals",
+    "max": "10000",
+    "sig": {
+      "pk": "04E32DF42865E97135ACFB65F3BAE71BDC86F4D49150AD6A440B6F15878109880A0A2B2667F7E725CEEA70C673093BF67663E0312623C8E091B13CF2C0F11EF652",
+      "fields": ["rec", "uid", "exph"]
+    },
+    "buri": "https://ipfs.io/abc/"
+}
+```
+
+* The signature for any subsequent minted inscriptions must be signed by the private key of the sig.pk, otherwise the inscription is invalid.
+
+Example 3, deploy NFT with onchain metadata and make the collection immutable:
 
 ``` json
 {
@@ -52,6 +70,8 @@ Deploy NFT with onchain metadata and make the collection immutable:
 
 * All tokens of the collections will share the same metadata.
 
+#### Inscription Specification
+
 | Key | Required? | Description |
 |---|---|---|
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
@@ -61,10 +81,11 @@ Deploy NFT with onchain metadata and make the collection immutable:
 | upd | No | Whether the metadata is updatable, default is `true` |
 | buri | No | BaseURI URI for the brc-721, access `{buri}{token_id}` for the metadata of a token |
 | meta | No | The metadata of the collection |
+| sig | No | The public key and fields for the minted inscription's signature |
 
 * if `upd` is `true`, the deployer can update the metadata of the collection by sending an `update` inscription; otherwise, the metadata is immutable, any `update` op will be invalid.
 
-#### Metadata
+#### Meta Specification
 
 | Key | Required? | Description |
 |---|---|---|
@@ -75,7 +96,22 @@ Deploy NFT with onchain metadata and make the collection immutable:
 
 * For more information about token URI and metadata, please refer to [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [metadata standards](https://docs.opensea.io/docs/metadata-standards)
 
+#### Sig Specification
+
+| Key | Required? | Description |
+|---|---|---|
+| pk | Yes | Public key: used to verify the signature of the minted inscriptions, in Compressed/Uncompressed format, represented in hexadecimal |
+| fields | No | Signature fields: `uid`, `expt`, `exph`, default value `[]` |
+| rec | No | Address of the inscription recipient, if `rec` is not the recipient of the inscription, the inscription is invalid |
+| uid | No | Whether the `uid` field used for the signature is unique, if provided, all subsequent minted inscriptions must have a unique `uid` field, any inscription with a repeated `uid` is invalid |
+| expt | No | Whether the `expt` field used for the signature is valid, if provided, all subsequent minted inscriptions must have an `expt` field that is greater than the `block_time` of the block minting the inscription, otherwise the inscription is invalid |
+| exph | No | Whether the `exph` field used for the signature is valid, if provided, all subsequent minted inscriptions must have an `exph` field that is greater than the `block_height` of the block minting the inscription, otherwise the inscription is invalid |
+
+* If `pk` is specified, the signature for any subsequent minted inscriptions must be signed by the private key of the `pk`, otherwise the inscription is invalid
+
 ### Mint brc-721
+
+Example 1, mint an inscription:
 
 ``` json
 {
@@ -85,13 +121,45 @@ Deploy NFT with onchain metadata and make the collection immutable:
 }
 ```
 
+Example 2, if `sig` is specified during deployment, mint an inscription with a signature:
+
+``` json
+{
+    "p": "brc-721",
+    "op": "mint",
+    "tick": "ordinals",
+    "sig": {
+      "s": "",
+      "uid": "",
+      "expt": ""
+    }
+}
+```
+
+#### Inscription Specification
+
 | Key | Required? | Description |
 |---|---|---|
 | p | Yes | Protocol: Helps other systems identify and process brc-721 events |
 | op | Yes | Operation: Type of event (deploy, mint, update) |
 | tick | Yes | Ticker: identifier of the brc-721, 4 to 8 letters, case insensive |
+| sig | No | Signature: used to verify the signature of the minted inscriptions, if `sig` is specified during deployment, the inscription must be signed |
+| s | No | DER encoded signature, represented in hexadecimal |
+| uid | No | The `uid` field used for the signature, used to uniquely identify the inscription, if `uid` is repeated, the inscription with the smallest inscription ID (token ID) is valid, and other inscriptions with repeated `uid` are invalid |
+| expt | No | The `expt` field used for the signature, used to specify the `expt` of the inscription, if `expt` is less than the `block_time` of the block minting the inscription, the inscription is invalid |
+| exph | No | The `exph` field used for the signature, used to specify the `exph` of the inscription, if `exph` is less than the `block_height` of the block minting the inscription, the inscription is invalid |
 
 * token ID is generated from 1 to `max` according to the order of inscription IDs.
+
+#### Signature Specification
+
+If `sig` is specified during deployment, the inscription must be signed, the signature specification is as follows:
+
+* If the `rec` field is specified in the `sig` of the deploy inscription, the field is the address of the recipient of the minted inscription, and does not need to be specified separately in the inscription
+* Original signature message: Sort the fields specified in `fields` in lexicographical order, and then concatenate them in the format of `key=value`, for example: `exph=100&rec=xxx&uid=xxx`
+  * If `key` is not in `fields`, it should not be included in the original signature message
+* The original message is hashed twice using SHA256 to generate the message digest `h`
+* The signature `s` is generated by signing the message digest `h` with the private key of `sig.pk` using the ECDSA secp256k1 algorithm, and encoded in DER format to generate `sig.s`
 
 ### Transfer brc-721
 
@@ -109,6 +177,8 @@ It's simple to transfer an brc-721 token, just send the inscription minted above
     "meta": { ... }
 }
 ```
+
+#### Inscription Specification
 
 | Key | Required? | Description |
 |---|---|---|
@@ -198,3 +268,17 @@ BRC-721 is an experimental standard that brings non-fungible tokens (NFTs) to th
 The standard allows for a series of operations that facilitate the management of non-fungible tokens, including deployment, minting, transferring, and updating metadata. Each token is assigned a unique identifier, ensuring that each NFT is distinct and cannot be exchanged on a one-to-one basis with another NFT.  
 
 As an experimental standard, BRC-721 invites improvements and modifications to enhance its functionality and adapt it to the growing needs of the NFT ecosystem.
+
+## Change Log
+
+### v0.0.3
+
+* Add `sig` field to the deploy inscription and mint inscription
+
+### v0.0.2
+
+* Add `upd` field to the deploy inscription and update inscription
+
+### v0.0.1
+
+* Initial version
